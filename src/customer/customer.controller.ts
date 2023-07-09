@@ -29,6 +29,10 @@ import { FileUploadDto } from 'src/shared/dto/fileupload.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { ApiResponse } from 'src/shared/dto/ApiResponse.dto';
+import {
+  SearchCustomerSwaggerDto,
+  CreateCustomerSwaggerDto,
+} from './dto/customer.dto';
 
 @ApiTags('Customer')
 @Controller('v1/customer')
@@ -40,6 +44,21 @@ export class CustomerController {
   async getCustomers(@Res() res: Response): Promise<Response> {
     try {
       const data = await this.customerService.getCustomers();
+      return res.json(new ApiResponse('Success', HttpStatus.OK, data));
+    } catch (err) {
+      return res.json(new ApiResponse(err.message, err.status, null));
+    }
+  }
+
+  // Search customers by name
+  @Get('/search')
+  async searchCustomersByName(
+    @Res() res: Response,
+    @Body() body: SearchCustomerSwaggerDto,
+  ): Promise<Response> {
+    try {
+      const { name } = body;
+      const data = await this.customerService.searchCustomersByName(name);
       return res.json(new ApiResponse('Success', HttpStatus.OK, data));
     } catch (err) {
       return res.json(new ApiResponse(err.message, err.status, null));
@@ -61,45 +80,19 @@ export class CustomerController {
     }
   }
 
-  // // Tao moi nguoi dung
-  // @Post('/')
-  // async createNguoiDung(
-  //   @Res() res: Response,
-  //   @Body() body: NguoiDungSwaggerDto,
-  //   @Headers('userToken') token: string,
-  // ): Promise<Response> {
-  //   try {
-  //     const data = await this.nguoiDungService.createNguoiDung(token, body);
-  //     return res.status(201).json({
-  //       message: 'Success',
-  //       statusCode: 201,
-  //       content: data,
-  //       dateTime: new Date(),
-  //     });
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.FORBIDDEN);
-  //   }
-  // }
-
-  // // Search nguoi dung theo ten
-  // @Get('/search/:tenNguoiDung')
-  // @ApiParam({ name: 'tenNguoiDung', required: true, type: String })
-  // async searchNguoiDungByName(
-  //   @Res() res: Response,
-  //   @Param('tenNguoiDung') name: string,
-  // ): Promise<Response> {
-  //   try {
-  //     const data = await this.nguoiDungService.searchNguoiDungByName(name);
-  //     return res.status(200).json({
-  //       message: 'Success',
-  //       statusCode: 200,
-  //       content: data,
-  //       dateTime: new Date(),
-  //     });
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.FORBIDDEN);
-  //   }
-  // }
+  // Create customer by admin
+  @Post('/')
+  async createCustomer(
+    @Res() res: Response,
+    @Body() body: CreateCustomerSwaggerDto,
+  ): Promise<Response> {
+    try {
+      const data = await this.customerService.createCustomer(body);
+      return res.json(new ApiResponse('Success', HttpStatus.OK, data));
+    } catch (err) {
+      return res.json(new ApiResponse(err.message, err.status, null));
+    }
+  }
 
   // // Cap nhat nguoi dung
   // @Put('/:id')

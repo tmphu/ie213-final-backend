@@ -1,10 +1,7 @@
 import {
   ConflictException,
-  HttpException,
-  HttpStatus,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -12,7 +9,6 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaClient } from '@prisma/client';
 import { UserSignupDto } from './dto/auth.dto';
 import * as bcrypt from 'bcrypt';
-import { ApiResponse } from 'src/shared/dto/ApiResponse.dto';
 
 const CUSTOMER = 'CUSTOMER';
 

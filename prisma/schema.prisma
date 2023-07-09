@@ -60,9 +60,6 @@ model Room {
   description         String?              @db.VarChar(1000)
   property_type       Int?
   room_type           Int?
-  country_id          Int?
-  city_id             Int?
-  district_id         Int?
   address             String?              @db.VarChar(255)
   max_guests          Int?
   cancellation_policy String?              @db.VarChar(1000)
@@ -74,6 +71,8 @@ model Room {
   host_id             Int?
   host                Host?                @relation(fields: [host_id], references: [id])
   amenity             Amenity[]            @relation("room_amenity")
+  location_id         Int?
+  location            Location?            @relation(fields: [location_id], references: [id])
   booking             Booking[]
   PaymentTransaction  PaymentTransaction[]
   RoomImage           RoomImage[]
@@ -86,7 +85,7 @@ model RoomImage {
   id          Int       @id @default(autoincrement())
   created_at  DateTime? @default(now())
   updated_at  DateTime? @updatedAt
-  image       String    @db.VarChar(1000)
+  image       String?   @db.VarChar(1000)
   uploaded_by Int?
   user        User?     @relation(fields: [uploaded_by], references: [id])
   room_id     Int?
@@ -95,11 +94,23 @@ model RoomImage {
   @@map("room_image")
 }
 
+model Location {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+  location   String?   @db.VarChar(255)
+  city       String?   @db.VarChar(255)
+  image      String?   @db.VarChar(1000)
+  Room       Room[]
+
+  @@map("location")
+}
+
 model Review {
   id          Int       @id @default(autoincrement())
   created_at  DateTime? @default(now())
   updated_at  DateTime? @updatedAt
-  comment     String    @db.VarChar(1000)
+  comment     String?   @db.VarChar(1000)
   rating      Int?
   reviewed_by Int?
   user        User?     @relation(fields: [reviewed_by], references: [id])

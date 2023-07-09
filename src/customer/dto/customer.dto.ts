@@ -10,31 +10,34 @@ interface CustomerDto {
   gender: string;
 }
 
-class CustomerSwaggerDto {
+class CreateCustomerSwaggerDto {
   @ApiProperty({
-    example: 'john appleseed',
-    description: 'name',
-    type: String,
-  })
-  name: string;
-
-  @ApiProperty({
-    example: 'john@example.com',
+    example: 'user@example.com',
     description: 'email',
     type: String,
   })
   email: string;
 
-  @ApiProperty({
-    example: '123456',
-    description: 'password',
-    type: String,
-  })
+  @ApiProperty({ example: 'mypassword', description: 'password', type: String })
   password: string;
 
   @ApiProperty({
-    example: '0945600864',
-    description: 'phone_number',
+    example: 'john',
+    description: 'first name',
+    type: String,
+  })
+  firstName: string;
+
+  @ApiProperty({
+    example: 'appleseed',
+    description: 'last name',
+    type: String,
+  })
+  lastName: string;
+
+  @ApiProperty({
+    example: '0912345678',
+    description: 'phone number',
     type: String,
   })
   phone_number: string;
@@ -45,20 +48,15 @@ class CustomerSwaggerDto {
     type: String,
   })
   gender: string;
+}
 
+class SearchCustomerSwaggerDto {
   @ApiProperty({
-    example: 'CUSTOMER',
-    description: 'role',
+    example: 'john',
+    description: 'name',
     type: String,
   })
-  role: string;
-
-  @ApiProperty({
-    example: 'https://example.com/image.jpg',
-    description: 'profile_photo',
-    type: String,
-  })
-  profile_photo: string;
+  name: string;
 }
 
 function mapToCustomerFlatDto(...args: any[]): CustomerDto[] {
@@ -73,4 +71,9 @@ function mapToCustomerFlatDto(...args: any[]): CustomerDto[] {
   }));
 }
 
-export { CustomerDto, CustomerSwaggerDto, mapToCustomerFlatDto };
+export {
+  CustomerDto,
+  mapToCustomerFlatDto,
+  SearchCustomerSwaggerDto,
+  CreateCustomerSwaggerDto,
+};
