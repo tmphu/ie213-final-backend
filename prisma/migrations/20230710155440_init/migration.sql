@@ -42,17 +42,13 @@ CREATE TABLE `host` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `room` (
+CREATE TABLE `house` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `created_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NULL,
     `name` VARCHAR(255) NULL,
     `description` VARCHAR(1000) NULL,
     `property_type` INTEGER NULL,
-    `room_type` INTEGER NULL,
-    `country_id` INTEGER NULL,
-    `city_id` INTEGER NULL,
-    `district_id` INTEGER NULL,
     `address` VARCHAR(255) NULL,
     `max_guests` INTEGER NULL,
     `cancellation_policy` VARCHAR(1000) NULL,
@@ -62,18 +58,31 @@ CREATE TABLE `room` (
     `price` INTEGER NULL,
     `is_active` BOOLEAN NULL DEFAULT false,
     `host_id` INTEGER NULL,
+    `location_id` INTEGER NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `room_image` (
+CREATE TABLE `house_image` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `created_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NULL,
-    `image` VARCHAR(1000) NOT NULL,
+    `image` VARCHAR(1000) NULL,
     `uploaded_by` INTEGER NULL,
-    `room_id` INTEGER NULL,
+    `house_id` INTEGER NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `location` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `created_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NULL,
+    `location` VARCHAR(255) NULL,
+    `city` VARCHAR(255) NULL,
+    `image` VARCHAR(1000) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -83,10 +92,10 @@ CREATE TABLE `review` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `created_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NULL,
-    `comment` VARCHAR(1000) NOT NULL,
+    `comment` VARCHAR(1000) NULL,
     `rating` INTEGER NULL,
     `reviewed_by` INTEGER NULL,
-    `room_id` INTEGER NULL,
+    `house_id` INTEGER NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -113,7 +122,7 @@ CREATE TABLE `booking` (
     `price_per_day` INTEGER NULL,
     `total_price` INTEGER NULL,
     `payment_method` VARCHAR(255) NULL,
-    `room_id` INTEGER NULL,
+    `house_id` INTEGER NULL,
     `user_id` INTEGER NULL,
 
     PRIMARY KEY (`id`)
@@ -129,19 +138,18 @@ CREATE TABLE `payment_transaction` (
     `payment_date` DATETIME(3) NULL,
     `is_success` BOOLEAN NULL DEFAULT false,
     `payment_gateway` VARCHAR(255) NULL,
-    `room_id` INTEGER NULL,
     `booking_id` INTEGER NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `_room_amenity` (
+CREATE TABLE `_house_amenity` (
     `A` INTEGER NOT NULL,
     `B` INTEGER NOT NULL,
 
-    UNIQUE INDEX `_room_amenity_AB_unique`(`A`, `B`),
-    INDEX `_room_amenity_B_index`(`B`)
+    UNIQUE INDEX `_house_amenity_AB_unique`(`A`, `B`),
+    INDEX `_house_amenity_B_index`(`B`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
@@ -151,34 +159,34 @@ ALTER TABLE `customer` ADD CONSTRAINT `customer_user_id_fkey` FOREIGN KEY (`user
 ALTER TABLE `host` ADD CONSTRAINT `host_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `room` ADD CONSTRAINT `room_host_id_fkey` FOREIGN KEY (`host_id`) REFERENCES `host`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `house` ADD CONSTRAINT `house_host_id_fkey` FOREIGN KEY (`host_id`) REFERENCES `host`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `room_image` ADD CONSTRAINT `room_image_uploaded_by_fkey` FOREIGN KEY (`uploaded_by`) REFERENCES `user`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `house` ADD CONSTRAINT `house_location_id_fkey` FOREIGN KEY (`location_id`) REFERENCES `location`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `room_image` ADD CONSTRAINT `room_image_room_id_fkey` FOREIGN KEY (`room_id`) REFERENCES `room`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `house_image` ADD CONSTRAINT `house_image_uploaded_by_fkey` FOREIGN KEY (`uploaded_by`) REFERENCES `user`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `house_image` ADD CONSTRAINT `house_image_house_id_fkey` FOREIGN KEY (`house_id`) REFERENCES `house`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `review` ADD CONSTRAINT `review_reviewed_by_fkey` FOREIGN KEY (`reviewed_by`) REFERENCES `user`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `review` ADD CONSTRAINT `review_room_id_fkey` FOREIGN KEY (`room_id`) REFERENCES `room`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `review` ADD CONSTRAINT `review_house_id_fkey` FOREIGN KEY (`house_id`) REFERENCES `house`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `booking` ADD CONSTRAINT `booking_room_id_fkey` FOREIGN KEY (`room_id`) REFERENCES `room`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `booking` ADD CONSTRAINT `booking_house_id_fkey` FOREIGN KEY (`house_id`) REFERENCES `house`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `booking` ADD CONSTRAINT `booking_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `payment_transaction` ADD CONSTRAINT `payment_transaction_room_id_fkey` FOREIGN KEY (`room_id`) REFERENCES `room`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE `payment_transaction` ADD CONSTRAINT `payment_transaction_booking_id_fkey` FOREIGN KEY (`booking_id`) REFERENCES `booking`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `_room_amenity` ADD CONSTRAINT `_room_amenity_A_fkey` FOREIGN KEY (`A`) REFERENCES `amenity`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `_house_amenity` ADD CONSTRAINT `_house_amenity_A_fkey` FOREIGN KEY (`A`) REFERENCES `amenity`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `_room_amenity` ADD CONSTRAINT `_room_amenity_B_fkey` FOREIGN KEY (`B`) REFERENCES `room`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `_house_amenity` ADD CONSTRAINT `_house_amenity_B_fkey` FOREIGN KEY (`B`) REFERENCES `house`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

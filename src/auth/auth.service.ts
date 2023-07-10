@@ -7,7 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaClient } from '@prisma/client';
-import { UserSignupDto } from './dto/auth.dto';
+import { UserSignupDto, mapToUserLoginResponseDto } from './dto/auth.dto';
 import * as bcrypt from 'bcrypt';
 
 const CUSTOMER = 'CUSTOMER';
@@ -25,6 +25,9 @@ export class AuthService {
       where: {
         email: email,
       },
+      include: {
+        customer: true,
+      },
     });
     if (user) {
       const isMatch = bcrypt.compareSync(password, user.password);
@@ -33,7 +36,7 @@ export class AuthService {
           { data: { email: email, password: password } },
           { secret: this.secretKey, expiresIn: this.expiryDuration },
         );
-        return token;
+        return mapToUserLoginResponseDto(user, token);
       }
     }
     throw new UnauthorizedException('Incorrect username or password');
@@ -55,8 +58,8 @@ export class AuthService {
         data: {
           email: payload.email,
           password: bcrypt.hashSync(payload.password, 10),
-          first_name: payload.firstName,
-          last_name: payload.lastName,
+          first_name: payload.first_name,
+          last_name: payload.last_name,
           phone_number: payload.phone_number,
           gender: payload.gender,
           role: CUSTOMER,

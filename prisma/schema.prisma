@@ -8,20 +8,20 @@ datasource db {
 }
 
 model User {
-  id           Int         @id @default(autoincrement())
-  created_at   DateTime?   @default(now())
-  updated_at   DateTime?   @updatedAt
-  first_name   String?     @db.VarChar(255)
-  last_name    String?     @db.VarChar(255)
-  email        String      @unique @db.VarChar(255)
-  password     String?     @db.VarChar(255)
-  phone_number String?     @db.VarChar(255)
-  gender       String?     @db.VarChar(255)
-  role         String?     @db.VarChar(255)
+  id           Int          @id @default(autoincrement())
+  created_at   DateTime?    @default(now())
+  updated_at   DateTime?    @updatedAt
+  first_name   String?      @db.VarChar(255)
+  last_name    String?      @db.VarChar(255)
+  email        String       @unique @db.VarChar(255)
+  password     String?      @db.VarChar(255)
+  phone_number String?      @db.VarChar(255)
+  gender       String?      @db.VarChar(255)
+  role         String?      @db.VarChar(255)
   customer     Customer?
   host         Host?
   Booking      Booking[]
-  RoomImage    RoomImage[]
+  HouseImage   HouseImage[]
   Review       Review[]
 
   @@map("user")
@@ -47,19 +47,18 @@ model Host {
   profile_photo String?   @db.VarChar(1000)
   user_id       Int?      @unique
   user          User?     @relation(fields: [user_id], references: [id])
-  room          Room[]
+  house         House[]
 
   @@map("host")
 }
 
-model Room {
+model House {
   id                  Int                  @id @default(autoincrement())
   created_at          DateTime?            @default(now())
   updated_at          DateTime?            @updatedAt
   name                String?              @db.VarChar(255)
   description         String?              @db.VarChar(1000)
   property_type       Int?
-  room_type           Int?
   address             String?              @db.VarChar(255)
   max_guests          Int?
   cancellation_policy String?              @db.VarChar(1000)
@@ -70,28 +69,27 @@ model Room {
   is_active           Boolean?             @default(false)
   host_id             Int?
   host                Host?                @relation(fields: [host_id], references: [id])
-  amenity             Amenity[]            @relation("room_amenity")
+  amenity             Amenity[]            @relation("house_amenity")
   location_id         Int?
   location            Location?            @relation(fields: [location_id], references: [id])
   booking             Booking[]
-  PaymentTransaction  PaymentTransaction[]
-  RoomImage           RoomImage[]
+  HouseImage          HouseImage[]
   Review              Review[]
 
-  @@map("room")
+  @@map("house")
 }
 
-model RoomImage {
+model HouseImage {
   id          Int       @id @default(autoincrement())
   created_at  DateTime? @default(now())
   updated_at  DateTime? @updatedAt
   image       String?   @db.VarChar(1000)
   uploaded_by Int?
   user        User?     @relation(fields: [uploaded_by], references: [id])
-  room_id     Int?
-  room        Room?     @relation(fields: [room_id], references: [id])
+  house_id    Int?
+  house       House?    @relation(fields: [house_id], references: [id])
 
-  @@map("room_image")
+  @@map("house_image")
 }
 
 model Location {
@@ -101,7 +99,7 @@ model Location {
   location   String?   @db.VarChar(255)
   city       String?   @db.VarChar(255)
   image      String?   @db.VarChar(1000)
-  Room       Room[]
+  House      House[]
 
   @@map("location")
 }
@@ -114,8 +112,8 @@ model Review {
   rating      Int?
   reviewed_by Int?
   user        User?     @relation(fields: [reviewed_by], references: [id])
-  room_id     Int?
-  room        Room?     @relation(fields: [room_id], references: [id])
+  house_id    Int?
+  house       House?    @relation(fields: [house_id], references: [id])
 
   @@map("review")
 }
@@ -126,7 +124,7 @@ model Amenity {
   updated_at DateTime? @updatedAt
   code       String?   @db.VarChar(10)
   name       String?   @db.VarChar(255)
-  room       Room[]    @relation("room_amenity")
+  house      House[]   @relation("house_amenity")
 
   @@map("amenity")
 }
@@ -141,8 +139,8 @@ model Booking {
   price_per_day      Int?
   total_price        Int?
   payment_method     String?              @db.VarChar(255)
-  room_id            Int?
-  room               Room?                @relation(fields: [room_id], references: [id])
+  house_id           Int?
+  house              House?               @relation(fields: [house_id], references: [id])
   user_id            Int?
   user               User?                @relation(fields: [user_id], references: [id])
   PaymentTransaction PaymentTransaction[]
@@ -159,8 +157,6 @@ model PaymentTransaction {
   payment_date    DateTime?
   is_success      Boolean?  @default(false)
   payment_gateway String?   @db.VarChar(255)
-  room_id         Int?
-  room            Room?     @relation(fields: [room_id], references: [id])
   booking_id      Int?
   booking         Booking?  @relation(fields: [booking_id], references: [id])
 
