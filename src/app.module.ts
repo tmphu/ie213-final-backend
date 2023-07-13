@@ -7,6 +7,7 @@ import { CustomerModule } from './customer/customer.module';
 import { LocationModule } from './location/location.module';
 import { HouseModule } from './house/house.module';
 import { HostModule } from './host/host.module';
+import { AmenityModule } from './amenity/amenity.module';
 // import { BinhluanModule } from './binhluan/binhluan.module';
 // import { VitriModule } from './vitri/vitri.module';
 // import { PhongModule } from './phong/phong.module';
@@ -20,6 +21,7 @@ import { HostModule } from './host/host.module';
     HostModule,
     LocationModule,
     HouseModule,
+    AmenityModule,
     // BinhluanModule,
     // DatphongModule,
   ],

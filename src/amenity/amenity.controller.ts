@@ -8,49 +8,29 @@ import {
   Res,
   Headers,
 } from '@nestjs/common';
-import { HouseService } from './house.service';
+import { AmenityService } from './amenity.service';
 import { Response } from 'express';
-import {
-  ApiBody,
-  ApiConsumes,
-  ApiParam,
-  ApiQuery,
-  ApiTags,
-} from '@nestjs/swagger';
-import {
-  Delete,
-  Param,
-  Put,
-  Query,
-  UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common/decorators';
-// import { FileUploadDto } from 'src/fileupload.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
+import { ApiTags } from '@nestjs/swagger';
+import { Param, Query } from '@nestjs/common/decorators';
 import { ApiResponse } from 'src/shared/dto/ApiResponse.dto';
-import { CreateHouseBody, GetHouseDto } from './dto/house.dto';
+import { CreateAmenityBody, GetAmenityDto } from './dto/amenity.dto';
 
-@ApiTags('House')
-@Controller('v1/house')
-export class HouseController {
-  constructor(private readonly houseService: HouseService) {}
+@ApiTags('Amenity')
+@Controller('v1/amenity')
+export class AmenityController {
+  constructor(private readonly amenityService: AmenityService) {}
 
-  // Get houses by location id
-  @Get('/location/:locationId')
-  @ApiParam({ name: 'locationId', required: true, type: Number })
-  async getHousesByLocationId(
-    @Param('locationId') locationId: string,
-    @Query() query: GetHouseDto,
+  // Get all amenities
+  @Get('/')
+  async getAmenities(
+    @Query() query: GetAmenityDto,
     @Res() res: Response,
   ): Promise<Response> {
     try {
       const { pageSize, currentPage } = query;
-      const intLocationId = parseInt(locationId);
       const intPageSize = parseInt(pageSize);
       const intCurrentPage = parseInt(currentPage);
-      const data = await this.houseService.getHousesByLocationId(
-        intLocationId,
+      const data = await this.amenityService.getAmenities(
         intPageSize,
         intCurrentPage,
       );
@@ -60,30 +40,14 @@ export class HouseController {
     }
   }
 
-  // Get house by id
-  @Get('/details/:id')
-  @ApiParam({ name: 'id', required: true, type: String })
-  async getHouseById(
-    @Param('id') id: string,
-    @Res() res: Response,
-  ): Promise<Response> {
-    try {
-      const intId = parseInt(id);
-      const data = await this.houseService.getHouseById(intId);
-      return res.json(new ApiResponse('Success', HttpStatus.OK, data));
-    } catch (err) {
-      return res.json(new ApiResponse(err.message, err.status, null));
-    }
-  }
-
-  // Create house
+  // Create amenity
   @Post('/')
-  async createHouse(
-    @Body() body: CreateHouseBody,
+  async createAmenity(
+    @Body() body: CreateAmenityBody,
     @Res() res: Response,
   ): Promise<Response> {
     try {
-      const data = await this.houseService.createHouse(body);
+      const data = await this.amenityService.createAmenity(body);
       return res.json(new ApiResponse('Success', HttpStatus.OK, data));
     } catch (err) {
       return res.json(new ApiResponse(err.message, err.status, null));

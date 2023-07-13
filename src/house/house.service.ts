@@ -24,12 +24,34 @@ export class HouseService {
           location_id: locationId,
         },
         include: {
-          host: true,
           HouseImage: true,
           amenity: true,
         },
         skip: pageSize * (currentPage - 1),
         take: pageSize,
+      });
+      if (!response) {
+        throw new NotFoundException('house not found');
+      }
+      return response;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  // Get house by id
+  async getHouseById(id: number): Promise<any> {
+    try {
+      const response = await this.prisma.house.findFirst({
+        where: {
+          id: id,
+        },
+        include: {
+          host: true,
+          HouseImage: true,
+          amenity: true,
+          Review: true,
+        },
       });
       if (!response) {
         throw new NotFoundException('house not found');
@@ -58,6 +80,9 @@ export class HouseService {
     if (!location) {
       throw new NotFoundException('not found location_id');
     }
+    const amenityList = payload.amenity?.id.map((e) => {
+      return { id: e };
+    });
     try {
       const createHouseResponse = await this.prisma.house.create({
         data: {
@@ -80,9 +105,13 @@ export class HouseService {
               uploaded_by: payload.host_id,
             },
           },
+          amenity: {
+            connect: amenityList,
+          },
         },
         include: {
           HouseImage: true,
+          amenity: true,
         },
       });
       return createHouseResponse;
@@ -90,45 +119,6 @@ export class HouseService {
       throw new InternalServerErrorException('error when creating house');
     }
   }
-
-  // // Tao moi phong
-  // async createPhong(token: string, phong: PhongSwaggerDto): Promise<PhongDto> {
-  //   const isValidToken = await this.authService.validateToken(token);
-  //   if (!isValidToken) {
-  //     throw new Error('Token is not valid');
-  //   }
-
-  //   const isValidViTri = await this.prisma.vi_tri.findUnique({
-  //     where: {
-  //       id: phong.vi_tri,
-  //     },
-  //   });
-  //   if (!isValidViTri) {
-  //     throw new Error('Vi tri khong ton tai');
-  //   }
-
-  //   const data = await this.prisma.phong.create({
-  //     data: phong,
-  //   });
-  //   return data;
-  // }
-
-  // // Lay toan bo danh sach phong
-  // async getPhong(): Promise<PhongDto[]> {
-  //   const data = await this.prisma.phong.findMany();
-  //   return data;
-  // }
-
-  // // Lay phong theo id
-  // async getPhongById(idParam: string): Promise<PhongDto> {
-  //   const id = parseInt(idParam);
-  //   const data = await this.prisma.phong.findUnique({
-  //     where: {
-  //       id: id,
-  //     },
-  //   });
-  //   return data;
-  // }
 
   // // Cap nhat phong
   // async updatePhong(

@@ -1,5 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger/dist';
 
+interface AmenityList {
+  id: number[];
+}
+
 interface HouseDetailsDto {
   id: number;
   name: string;
@@ -120,6 +124,13 @@ class CreateHouseBody {
     type: String,
   })
   image: string;
+
+  @ApiProperty({
+    example: { id: [1, 2] },
+    description: 'amenity',
+    type: Object,
+  })
+  amenity: AmenityList;
 }
 
 class GetHouseDto {
