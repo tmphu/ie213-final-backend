@@ -59,6 +59,22 @@ class SearchCustomerSwaggerDto {
   name: string;
 }
 
+class GetCustomersDto {
+  @ApiProperty({
+    example: '10',
+    description: 'pageSize',
+    type: String,
+  })
+  pageSize: string;
+
+  @ApiProperty({
+    example: '1',
+    description: 'currentPage',
+    type: String,
+  })
+  currentPage: string;
+}
+
 function mapToCustomerFlatDto(...args: any[]): CustomerDto[] {
   return args.map((customer) => ({
     customer_id: customer.id,
@@ -76,4 +92,5 @@ export {
   mapToCustomerFlatDto,
   SearchCustomerSwaggerDto,
   CreateCustomerSwaggerDto,
+  GetCustomersDto,
 };

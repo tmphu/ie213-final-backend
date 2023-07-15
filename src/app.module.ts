@@ -8,10 +8,7 @@ import { LocationModule } from './location/location.module';
 import { HouseModule } from './house/house.module';
 import { HostModule } from './host/host.module';
 import { AmenityModule } from './amenity/amenity.module';
-// import { BinhluanModule } from './binhluan/binhluan.module';
-// import { VitriModule } from './vitri/vitri.module';
-// import { PhongModule } from './phong/phong.module';
-// import { DatphongModule } from './datphong/datphong.module';
+import { BookingModule } from './booking/booking.module';
 
 @Module({
   imports: [
@@ -22,8 +19,8 @@ import { AmenityModule } from './amenity/amenity.module';
     LocationModule,
     HouseModule,
     AmenityModule,
+    BookingModule,
     // BinhluanModule,
-    // DatphongModule,
   ],
   controllers: [AppController],
   providers: [AppService],

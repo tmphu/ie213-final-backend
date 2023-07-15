@@ -27,6 +27,7 @@ export class AuthService {
       },
       include: {
         customer: true,
+        host: true,
       },
     });
     if (user) {

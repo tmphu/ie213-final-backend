@@ -32,6 +32,7 @@ import { ApiResponse } from 'src/shared/dto/ApiResponse.dto';
 import {
   SearchCustomerSwaggerDto,
   CreateCustomerSwaggerDto,
+  GetCustomersDto,
 } from './dto/customer.dto';
 
 @ApiTags('Customer')
@@ -41,9 +42,18 @@ export class CustomerController {
 
   // Get all customers
   @Get('/')
-  async getCustomers(@Res() res: Response): Promise<Response> {
+  async getCustomers(
+    @Query() query: GetCustomersDto,
+    @Res() res: Response,
+  ): Promise<Response> {
     try {
-      const data = await this.customerService.getCustomers();
+      const { pageSize, currentPage } = query;
+      const intPageSize = parseInt(pageSize);
+      const intCurrentPage = parseInt(currentPage);
+      const data = await this.customerService.getCustomers(
+        intPageSize,
+        intCurrentPage,
+      );
       return res.json(new ApiResponse('Success', HttpStatus.OK, data));
     } catch (err) {
       return res.json(new ApiResponse(err.message, err.status, null));

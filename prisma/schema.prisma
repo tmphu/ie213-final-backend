@@ -53,25 +53,25 @@ model Host {
 }
 
 model House {
-  id                  Int                  @id @default(autoincrement())
-  created_at          DateTime?            @default(now())
-  updated_at          DateTime?            @updatedAt
-  name                String?              @db.VarChar(255)
-  description         String?              @db.VarChar(1000)
+  id                  Int          @id @default(autoincrement())
+  created_at          DateTime?    @default(now())
+  updated_at          DateTime?    @updatedAt
+  name                String?      @db.VarChar(255)
+  description         String?      @db.VarChar(1000)
   property_type       Int?
-  address             String?              @db.VarChar(255)
+  address             String?      @db.VarChar(255)
   max_guests          Int?
-  cancellation_policy String?              @db.VarChar(1000)
+  cancellation_policy String?      @db.VarChar(1000)
   bedrooms            Int?
   beds                Int?
   bathrooms           Int?
   price               Int?
-  is_active           Boolean?             @default(false)
+  is_active           Boolean?     @default(false)
   host_id             Int?
-  host                Host?                @relation(fields: [host_id], references: [id])
-  amenity             Amenity[]            @relation("house_amenity")
+  host                Host?        @relation(fields: [host_id], references: [id])
+  amenity             Amenity[]    @relation("house_amenity")
   location_id         Int?
-  location            Location?            @relation(fields: [location_id], references: [id])
+  location            Location?    @relation(fields: [location_id], references: [id])
   booking             Booking[]
   HouseImage          HouseImage[]
   Review              Review[]
@@ -134,8 +134,9 @@ model Booking {
   created_at         DateTime?            @default(now())
   updated_at         DateTime?            @updatedAt
   booking_date       DateTime?
-  check_in_date      DateTime?
-  check_out_date     DateTime?
+  check_in_date      String?
+  check_out_date     String?
+  guest_number       Int?
   price_per_day      Int?
   total_price        Int?
   payment_method     String?              @db.VarChar(255)

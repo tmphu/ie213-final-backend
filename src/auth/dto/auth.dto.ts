@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger/dist';
-import { User } from '@prisma/client';
+import { Customer, Host, User } from '@prisma/client';
 
 class UserLoginDto {
   @ApiProperty({
@@ -15,6 +15,7 @@ class UserLoginDto {
 
 class UserLoginResponseDto {
   user: {
+    id: number;
     first_name: string;
     last_name: string;
     email: string;
@@ -27,18 +28,21 @@ class UserLoginResponseDto {
 }
 
 function mapToUserLoginResponseDto(
-  user: any,
+  user: User & { host: Host; customer: Customer },
   token: string,
 ): UserLoginResponseDto {
   return {
     user: {
+      id: user.id,
       first_name: user.first_name,
       last_name: user.last_name,
       email: user.email,
       phone_number: user.phone_number,
       gender: user.gender,
       role: user.role,
-      profile_photo: user?.customer.profile_photo,
+      profile_photo: user.customer
+        ? user.customer.profile_photo
+        : user.host.profile_photo,
     },
     token: token,
   };

@@ -24,9 +24,9 @@ export class CustomerService {
   private prisma = new PrismaClient();
 
   // Get all customers
-  async getCustomers(): Promise<CustomerDto[]> {
+  async getCustomers(pageSize = 10, currentPage = 1): Promise<any> {
     try {
-      const getCustomersResponse = await this.prisma.customer.findMany({
+      const response = await this.prisma.customer.findMany({
         select: {
           id: true,
           profile_photo: true,
@@ -41,11 +41,15 @@ export class CustomerService {
             },
           },
         },
+        skip: pageSize * (currentPage - 1),
+        take: pageSize,
       });
-      if (getCustomersResponse.length === 0) {
+      if (response.length === 0) {
         throw new NotFoundException('customer not found');
       }
-      return mapToCustomerFlatDto(...getCustomersResponse);
+      const data = mapToCustomerFlatDto(...response);
+      const totalCount = response.length;
+      return { data, totalCount };
     } catch (err) {
       throw err;
     }
