@@ -29,12 +29,36 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { ApiResponse } from 'src/shared/dto/ApiResponse.dto';
-import { CreateHouseBody, GetHouseDto } from './dto/house.dto';
+import { CreateHouseBody, GetHouseDto, UpdateHouseBody } from './dto/house.dto';
 
 @ApiTags('House')
 @Controller('v1/house')
 export class HouseController {
   constructor(private readonly houseService: HouseService) {}
+
+  // Get all houses
+  @Get('/host/:hostId')
+  @ApiParam({ name: 'hostId', required: true, type: Number })
+  async getHouses(
+    @Param('hostId') hostId: string,
+    @Query() query: GetHouseDto,
+    @Res() res: Response,
+  ): Promise<Response> {
+    try {
+      const { pageSize, currentPage } = query;
+      const intHostId = parseInt(hostId);
+      const intPageSize = parseInt(pageSize);
+      const intCurrentPage = parseInt(currentPage);
+      const data = await this.houseService.getHouses(
+        intHostId,
+        intPageSize,
+        intCurrentPage,
+      );
+      return res.json(new ApiResponse('Success', HttpStatus.OK, data));
+    } catch (err) {
+      return res.json(new ApiResponse(err.message, err.status, null));
+    }
+  }
 
   // Get houses by location id
   @Get('/location/:locationId')
@@ -90,124 +114,21 @@ export class HouseController {
     }
   }
 
-  // // Get all rooms
-  // @Get('/')
-  // async getPhong(@Res() res: Response): Promise<Response> {
-  //   try {
-  //     const data = await this.phongService.getPhong();
-
-  //     return res.status(200).json({
-  //       message: 'Success',
-  //       statusCode: 200,
-  //       content: data,
-  //       dateTime: new Date(),
-  //     });
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.FORBIDDEN);
-  //   }
-  // }
-
-  // // Lay phong theo id
-  // @Get('/:id')
-  // @ApiParam({ name: 'id', required: true, type: Number })
-  // async getPhongById(
-  //   @Res() res: Response,
-  //   @Param('id') id: string,
-  // ): Promise<Response> {
-  //   try {
-  //     const data = await this.phongService.getPhongById(id);
-  //     return res.status(200).json({
-  //       message: 'Success',
-  //       statusCode: 200,
-  //       content: data,
-  //       dateTime: new Date(),
-  //     });
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.FORBIDDEN);
-  //   }
-  // }
-
-  // // Tao moi phong
-  // @Post('/')
-  // async createPhong(
-  //   @Res() res: Response,
-  //   @Body() body: PhongSwaggerDto,
-  //   @Headers('userToken') token: string,
-  // ): Promise<Response> {
-  //   try {
-  //     const data = await this.phongService.createPhong(token, body);
-  //     return res.status(201).json({
-  //       message: 'Success',
-  //       statusCode: 201,
-  //       content: data,
-  //       dateTime: new Date(),
-  //     });
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.FORBIDDEN);
-  //   }
-  // }
-
-  // // Lay phong theo vi tri
-  // @Get('/lay-phong-theo-vi-tri/')
-  // async getPhongByViTriId(
-  //   @Res() res: Response,
-  //   @Query('viTriId') id: string,
-  // ): Promise<Response> {
-  //   try {
-  //     const data = await this.phongService.getPhongByViTriId(id);
-  //     return res.status(200).json({
-  //       message: 'Success',
-  //       statusCode: 200,
-  //       content: data,
-  //       dateTime: new Date(),
-  //     });
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.FORBIDDEN);
-  //   }
-  // }
-
-  // // Cap nhat phong
-  // @Put('/:id')
-  // @ApiParam({ name: 'id', required: true, type: Number })
-  // async updatePhong(
-  //   @Res() res: Response,
-  //   @Body() body: PhongSwaggerDto,
-  //   @Param('id') id: string,
-  //   @Headers('userToken') token: string,
-  // ): Promise<Response> {
-  //   try {
-  //     const data = await this.phongService.updatePhong(token, id, body);
-  //     return res.status(200).json({
-  //       message: 'Success',
-  //       statusCode: 200,
-  //       content: data,
-  //       dateTime: new Date(),
-  //     });
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.FORBIDDEN);
-  //   }
-  // }
-
-  // // Xoa phong
-  // @Delete('/:id')
-  // @ApiParam({ name: 'id', required: true, type: Number })
-  // async deletePhong(
-  //   @Res() res: Response,
-  //   @Param('id') id: string,
-  //   @Headers('userToken') token: string,
-  // ): Promise<Response> {
-  //   try {
-  //     const data = await this.phongService.deletePhong(token, id);
-  //     return res.status(200).json({
-  //       message: 'Phong da duoc xoa thanh cong',
-  //       statusCode: 200,
-  //       content: data,
-  //       dateTime: new Date(),
-  //     });
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.FORBIDDEN);
-  //   }
-  // }
+  // Update house
+  @Put('/:id')
+  async updateHouse(
+    @Param('id') id: string,
+    @Body() body: UpdateHouseBody,
+    @Res() res: Response,
+  ): Promise<Response> {
+    try {
+      const intHouseId = parseInt(id);
+      const data = await this.houseService.updateHouse(intHouseId, body);
+      return res.json(new ApiResponse('Success', HttpStatus.OK, data));
+    } catch (err) {
+      return res.json(new ApiResponse(err.message, err.status, null));
+    }
+  }
 
   // // Upload hinh anh phong
   // @Post('/upload-hinh-phong')

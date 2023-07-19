@@ -50,6 +50,36 @@ class CreateCustomerSwaggerDto {
   gender: string;
 }
 
+class UpdateCustomerSwaggerDto {
+  @ApiProperty({
+    example: 'john',
+    description: 'first name',
+    type: String,
+  })
+  firstName: string;
+
+  @ApiProperty({
+    example: 'appleseed',
+    description: 'last name',
+    type: String,
+  })
+  lastName: string;
+
+  @ApiProperty({
+    example: '0912345678',
+    description: 'phone number',
+    type: String,
+  })
+  phone_number: string;
+
+  @ApiProperty({
+    example: 'male',
+    description: 'gender',
+    type: String,
+  })
+  gender: string;
+}
+
 class SearchCustomerSwaggerDto {
   @ApiProperty({
     example: 'john',
@@ -93,4 +123,5 @@ export {
   SearchCustomerSwaggerDto,
   CreateCustomerSwaggerDto,
   GetCustomersDto,
+  UpdateCustomerSwaggerDto,
 };

@@ -5,12 +5,59 @@ import {
 } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { AuthService } from 'src/auth/auth.service';
-import { CreateHouseBody } from './dto/house.dto';
+import { CreateHouseBody, UpdateHouseBody } from './dto/house.dto';
 
 @Injectable()
 export class HouseService {
   constructor(private readonly authService: AuthService) {}
   private prisma = new PrismaClient();
+
+  // Get all houses
+  async getHouses(
+    hostId: number,
+    pageSize = 10,
+    currentPage = 1,
+  ): Promise<any> {
+    try {
+      const userInfo = await this.prisma.user.findUnique({
+        where: {
+          id: hostId,
+        },
+      });
+      let response;
+      if (userInfo.role === 'ADMIN') {
+        response = await this.prisma.house.findMany({
+          include: {
+            HouseImage: true,
+            amenity: true,
+            location: true,
+          },
+          skip: pageSize * (currentPage - 1),
+          take: pageSize,
+        });
+      } else if (userInfo.role === 'HOST') {
+        response = await this.prisma.house.findMany({
+          where: {
+            host_id: hostId,
+          },
+          include: {
+            HouseImage: true,
+            amenity: true,
+            location: true,
+          },
+          skip: pageSize * (currentPage - 1),
+          take: pageSize,
+        });
+      }
+      if (!response) {
+        throw new NotFoundException('house not found');
+      }
+      const totalCount = response.length;
+      return { data: response, totalCount };
+    } catch (err) {
+      throw err;
+    }
+  }
 
   // Get houses by location id
   async getHousesByLocationId(
@@ -42,12 +89,16 @@ export class HouseService {
   // Get house by id
   async getHouseById(id: number): Promise<any> {
     try {
-      const response = await this.prisma.house.findFirst({
+      const response = await this.prisma.house.findUnique({
         where: {
           id: id,
         },
         include: {
-          host: true,
+          user: {
+            include: {
+              host: true,
+            },
+          },
           HouseImage: true,
           amenity: true,
           Review: true,
@@ -64,15 +115,15 @@ export class HouseService {
 
   // Create house
   async createHouse(payload: CreateHouseBody): Promise<any> {
-    const host = await this.prisma.host.findFirst({
+    const user = await this.prisma.user.findUnique({
       where: {
         id: payload.host_id,
       },
     });
-    if (!host) {
-      throw new NotFoundException('not found host_id');
+    if (!user) {
+      throw new NotFoundException('not found user');
     }
-    const location = await this.prisma.location.findFirst({
+    const location = await this.prisma.location.findUnique({
       where: {
         id: payload.location_id,
       },
@@ -80,7 +131,7 @@ export class HouseService {
     if (!location) {
       throw new NotFoundException('not found location_id');
     }
-    const amenityList = payload.amenity?.id.map((e) => {
+    const amenityList = payload.amenities.map((e) => {
       return { id: e };
     });
     try {
@@ -120,42 +171,102 @@ export class HouseService {
     }
   }
 
-  // // Cap nhat phong
-  // async updatePhong(
-  //   token: string,
-  //   idParam: string,
-  //   phong: PhongSwaggerDto,
-  // ): Promise<PhongDto> {
-  //   const id = parseInt(idParam);
-  //   const isValidToken = await this.authService.validateToken(token);
-
-  //   if (!isValidToken) {
-  //     throw new Error('Token is not valid');
-  //   }
-
-  //   const data = await this.prisma.phong.update({
-  //     where: {
-  //       id: id,
-  //     },
-  //     data: phong,
-  //   });
-  //   return data;
-  // }
-
-  // // Xoa phong
-  // async deletePhong(token: string, idParam: string): Promise<PhongDto> {
-  //   const id = parseInt(idParam);
-  //   const isValidToken = await this.authService.validateToken(token);
-
-  //   if (!isValidToken) {
-  //     throw new Error('Token is not valid');
-  //   }
-
-  //   const data = await this.prisma.phong.delete({
-  //     where: {
-  //       id: id,
-  //     },
-  //   });
-  //   return data;
-  // }
+  // Update house
+  async updateHouse(houseId: number, payload: UpdateHouseBody): Promise<any> {
+    try {
+      const house = await this.prisma.house.findUnique({
+        where: {
+          id: houseId,
+        },
+        include: {
+          user: {
+            include: {
+              host: true,
+            },
+          },
+          HouseImage: true,
+          amenity: true,
+        },
+      });
+      if (!house) {
+        throw new NotFoundException('error fetching house');
+      }
+      const amenityIds = house.amenity?.map(({ id }) => ({ id: id }));
+      const newAmenityIds = payload.amenities?.map((id) => ({ id: id }));
+      const response = await this.prisma.house.update({
+        where: {
+          id: houseId,
+        },
+        data: {
+          name: payload.name,
+          description: payload.description,
+          property_type: payload.property_type,
+          address: payload.address,
+          max_guests: payload.max_guests,
+          cancellation_policy: payload.cancellation_policy,
+          bedrooms: payload.bedrooms,
+          beds: payload.beds,
+          bathrooms: payload.bathrooms,
+          price: payload.price,
+          host_id: payload.host_id,
+          location_id: payload.location_id,
+        },
+      });
+      if (house.HouseImage.length > 0) {
+        await this.prisma.houseImage.update({
+          where: {
+            id: house.HouseImage[0].id,
+          },
+          data: {
+            image: payload.image,
+            uploaded_by: payload.host_id,
+          },
+        });
+      } else {
+        await this.prisma.houseImage.create({
+          data: {
+            image: payload.image,
+            user: {
+              connect: {
+                id: payload.host_id,
+              },
+            },
+            house: {
+              connect: {
+                id: houseId,
+              },
+            },
+          },
+        });
+      }
+      // update amenity
+      await this.prisma.$transaction([
+        // step 1: remove existing amenities
+        this.prisma.house.update({
+          where: {
+            id: houseId,
+          },
+          data: {
+            amenity: {
+              disconnect: amenityIds,
+            },
+          },
+        }),
+        // step 2: update amenity
+        this.prisma.house.update({
+          where: {
+            id: houseId,
+          },
+          data: {
+            amenity: {
+              connect: newAmenityIds,
+            },
+          },
+        }),
+      ]);
+      return response;
+    } catch (err) {
+      throw new InternalServerErrorException('error when updating house');
+    }
+  }
 }

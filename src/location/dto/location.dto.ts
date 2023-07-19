@@ -31,6 +31,29 @@ class CreateLocationBody {
   image: string;
 }
 
+class UpdateLocationBody {
+  @ApiProperty({
+    example: 'Phú Quốc',
+    description: 'location',
+    type: String,
+  })
+  location: string;
+
+  @ApiProperty({
+    example: 'Kiên Giang',
+    description: 'city',
+    type: String,
+  })
+  city: string;
+
+  @ApiProperty({
+    example: 'https://example.com/image.jpg',
+    description: 'image',
+    type: String,
+  })
+  image: string;
+}
+
 class GetLocationDto {
   @ApiProperty({
     example: '10',
@@ -61,4 +84,5 @@ export {
   mapToLocationFlatDto,
   GetLocationDto,
   LocationDto,
+  UpdateLocationBody,
 };

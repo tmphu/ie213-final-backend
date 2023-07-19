@@ -12,6 +12,7 @@ import {
   CustomerDto,
   mapToCustomerFlatDto,
   CreateCustomerSwaggerDto,
+  UpdateCustomerSwaggerDto,
 } from './dto/customer.dto';
 import { ApiResponse } from 'src/shared/dto/ApiResponse.dto';
 import * as bcrypt from 'bcrypt';
@@ -157,56 +158,56 @@ export class CustomerService {
       });
       return createUserResponse;
     } catch (err) {
-      throw new InternalServerErrorException('error when creating user');
+      throw new InternalServerErrorException('error when creating customer');
     }
   }
 
-  // // Tao moi nguoi dung
-  // async createNguoiDung(
-  //   token: string,
-  //   nguoiDung: NguoiDungSwaggerDto,
-  // ): Promise<NguoiDungDto> {
-  //   const isValidToken = await this.authService.validateToken(token);
-  //   if (!isValidToken) {
-  //     throw new Error('Token is not valid');
-  //   }
-
-  //   const user = await this.prisma.nguoi_dung.findUnique({
-  //     where: {
-  //       email: nguoiDung.email,
-  //     },
-  //   });
-  //   if (user) {
-  //     throw new Error('Email da ton tai trong he thong');
-  //   }
-
-  //   const data = await this.prisma.nguoi_dung.create({
-  //     data: nguoiDung,
-  //   });
-  //   return data;
-  // }
-
-  // // Cap nhat nguoi dung
-  // async updateNguoiDung(
-  //   token: string,
-  //   idParam: string,
-  //   nguoiDung: NguoiDungSwaggerDto,
-  // ): Promise<NguoiDungDto> {
-  //   const id = parseInt(idParam);
-  //   const isValidToken = await this.authService.validateToken(token);
-
-  //   if (!isValidToken) {
-  //     throw new Error('Token is not valid');
-  //   }
-
-  //   const data = await this.prisma.nguoi_dung.update({
-  //     where: {
-  //       id: id,
-  //     },
-  //     data: nguoiDung,
-  //   });
-  //   return data;
-  // }
+  // Update customer
+  async updateCustomer(
+    customerId: number,
+    payload: UpdateCustomerSwaggerDto,
+  ): Promise<any> {
+    const customer = await this.prisma.customer.findFirst({
+      where: {
+        id: customerId,
+      },
+      include: {
+        user: true,
+      },
+    });
+    if (!customer) {
+      throw new NotFoundException('error fetching customer');
+    }
+    try {
+      const response = await this.prisma.customer.update({
+        where: {
+          id: customerId,
+        },
+        data: {
+          user: {
+            update: {
+              first_name: payload.firstName
+                ? payload.firstName
+                : customer.user.first_name,
+              last_name: payload.lastName
+                ? payload.lastName
+                : customer.user.last_name,
+              phone_number: payload.phone_number
+                ? payload.phone_number
+                : customer.user.phone_number,
+              gender: payload.gender ? payload.gender : customer.user.gender,
+            },
+          },
+        },
+        include: {
+          user: true,
+        },
+      });
+      return response;
+    } catch (err) {
+      throw new InternalServerErrorException('error when updating customer');
+    }
+  }
 
   // // Xoa nguoi dung
   // async deleteNguoiDung(token: string, idParam: string): Promise<NguoiDungDto> {

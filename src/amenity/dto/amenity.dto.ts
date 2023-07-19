@@ -32,4 +32,20 @@ class GetAmenityDto {
   currentPage: string;
 }
 
-export { CreateAmenityBody, GetAmenityDto };
+class UpdateAmenityBody {
+  @ApiProperty({
+    example: 'may_giat',
+    description: 'code',
+    type: String,
+  })
+  code: string;
+
+  @ApiProperty({
+    example: 'Máy giặt',
+    description: 'name',
+    type: String,
+  })
+  name: string;
+}
+
+export { CreateAmenityBody, GetAmenityDto, UpdateAmenityBody };

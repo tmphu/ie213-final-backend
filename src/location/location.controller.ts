@@ -17,7 +17,11 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { GetLocationDto, CreateLocationBody } from './dto/location.dto';
+import {
+  GetLocationDto,
+  CreateLocationBody,
+  UpdateLocationBody,
+} from './dto/location.dto';
 import {
   Delete,
   Param,
@@ -69,70 +73,40 @@ export class LocationController {
       return res.json(new ApiResponse(err.message, err.status, null));
     }
   }
+
+  // Get location by id
+  @Get('/:id')
+  @ApiParam({ name: 'id', required: true, type: Number })
+  async getLocationById(
+    @Res() res: Response,
+    @Param('id') id: string,
+  ): Promise<Response> {
+    try {
+      const intId = parseInt(id);
+      const data = await this.locationService.getLocationById(intId);
+      return res.json(new ApiResponse('Success', HttpStatus.OK, data));
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.FORBIDDEN);
+    }
+  }
+
+  // Update location
+  @Put('/:id')
+  @ApiParam({ name: 'id', required: true, type: Number })
+  async updateLocation(
+    @Res() res: Response,
+    @Body() body: UpdateLocationBody,
+    @Param('id') id: string,
+  ): Promise<Response> {
+    try {
+      const intId = parseInt(id);
+      const data = await this.locationService.updateLocation(intId, body);
+      return res.json(new ApiResponse('Success', HttpStatus.OK, data));
+    } catch (err) {
+      return res.json(new ApiResponse(err.message, err.status, null));
+    }
+  }
 }
-
-//   // Lay vi tri theo id
-//   @Get('/:id')
-//   @ApiParam({ name: 'id', required: true, type: Number })
-//   async getViTriById(
-//     @Res() res: Response,
-//     @Param('id') id: string,
-//   ): Promise<Response> {
-//     try {
-//       const data = await this.viTriService.getViTriById(id);
-//       return res.status(200).json({
-//         message: 'Success',
-//         statusCode: 200,
-//         content: data,
-//         dateTime: new Date(),
-//       });
-//     } catch (error) {
-//       throw new HttpException(error.message, HttpStatus.FORBIDDEN);
-//     }
-//   }
-
-//   // Cap nhat vi tri
-//   @Put('/:id')
-//   @ApiParam({ name: 'id', required: true, type: Number })
-//   async updateViTri(
-//     @Res() res: Response,
-//     @Body() body: ViTriSwaggerDto,
-//     @Param('id') id: string,
-//     @Headers('userToken') token: string,
-//   ): Promise<Response> {
-//     try {
-//       const data = await this.viTriService.updateViTri(token, id, body);
-//       return res.status(200).json({
-//         message: 'Success',
-//         statusCode: 200,
-//         content: data,
-//         dateTime: new Date(),
-//       });
-//     } catch (error) {
-//       throw new HttpException(error.message, HttpStatus.FORBIDDEN);
-//     }
-//   }
-
-//   // Xoa vi tri
-//   @Delete('/:id')
-//   @ApiParam({ name: 'id', required: true, type: Number })
-//   async deleteViTri(
-//     @Res() res: Response,
-//     @Param('id') id: string,
-//     @Headers('userToken') token: string,
-//   ): Promise<Response> {
-//     try {
-//       const data = await this.viTriService.deleteViTri(token, id);
-//       return res.status(200).json({
-//         message: 'Vi tri da duoc xoa thanh cong',
-//         statusCode: 200,
-//         content: data,
-//         dateTime: new Date(),
-//       });
-//     } catch (error) {
-//       throw new HttpException(error.message, HttpStatus.FORBIDDEN);
-//     }
-//   }
 
 //   // Upload hinh anh vi tri
 //   @Post('/upload-hinh-vitri')

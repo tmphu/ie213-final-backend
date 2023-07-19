@@ -33,6 +33,7 @@ import {
   SearchCustomerSwaggerDto,
   CreateCustomerSwaggerDto,
   GetCustomersDto,
+  UpdateCustomerSwaggerDto,
 } from './dto/customer.dto';
 
 @ApiTags('Customer')
@@ -104,27 +105,22 @@ export class CustomerController {
     }
   }
 
-  // // Cap nhat nguoi dung
-  // @Put('/:id')
-  // @ApiParam({ name: 'id', required: true, type: Number })
-  // async updateNguoiDung(
-  //   @Res() res: Response,
-  //   @Body() body: NguoiDungSwaggerDto,
-  //   @Param('id') id: string,
-  //   @Headers('userToken') token: string,
-  // ): Promise<Response> {
-  //   try {
-  //     const data = await this.nguoiDungService.updateNguoiDung(token, id, body);
-  //     return res.status(200).json({
-  //       message: 'Success',
-  //       statusCode: 200,
-  //       content: data,
-  //       dateTime: new Date(),
-  //     });
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.FORBIDDEN);
-  //   }
-  // }
+  // Update customer
+  @Put('/:id')
+  @ApiParam({ name: 'id', required: true, type: Number })
+  async updateLocation(
+    @Res() res: Response,
+    @Body() body: UpdateCustomerSwaggerDto,
+    @Param('id') id: string,
+  ): Promise<Response> {
+    try {
+      const intId = parseInt(id);
+      const data = await this.customerService.updateCustomer(intId, body);
+      return res.json(new ApiResponse('Success', HttpStatus.OK, data));
+    } catch (err) {
+      return res.json(new ApiResponse(err.message, err.status, null));
+    }
+  }
 
   // // Xoa nguoi dung
   // @Delete('/:id')

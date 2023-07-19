@@ -23,6 +23,7 @@ model User {
   Booking      Booking[]
   HouseImage   HouseImage[]
   Review       Review[]
+  House        House[]
 
   @@map("user")
 }
@@ -47,7 +48,6 @@ model Host {
   profile_photo String?   @db.VarChar(1000)
   user_id       Int?      @unique
   user          User?     @relation(fields: [user_id], references: [id])
-  house         House[]
 
   @@map("host")
 }
@@ -68,7 +68,7 @@ model House {
   price               Int?
   is_active           Boolean?     @default(false)
   host_id             Int?
-  host                Host?        @relation(fields: [host_id], references: [id])
+  user                User?        @relation(fields: [host_id], references: [id])
   amenity             Amenity[]    @relation("house_amenity")
   location_id         Int?
   location            Location?    @relation(fields: [location_id], references: [id])
@@ -122,7 +122,7 @@ model Amenity {
   id         Int       @id @default(autoincrement())
   created_at DateTime? @default(now())
   updated_at DateTime? @updatedAt
-  code       String?   @db.VarChar(10)
+  code       String?   @db.VarChar(128)
   name       String?   @db.VarChar(255)
   house      House[]   @relation("house_amenity")
 

@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { AuthService } from 'src/auth/auth.service';
-import { CreateAmenityBody } from './dto/amenity.dto';
+import { CreateAmenityBody, UpdateAmenityBody } from './dto/amenity.dto';
 
 @Injectable()
 export class AmenityService {
@@ -14,7 +14,7 @@ export class AmenityService {
   private prisma = new PrismaClient();
 
   // Get all amenities
-  async getAmenities(pageSize = 10, currentPage = 1): Promise<any[]> {
+  async getAmenities(pageSize = 10, currentPage = 1): Promise<any> {
     try {
       const response = await this.prisma.amenity.findMany({
         skip: pageSize * (currentPage - 1),
@@ -23,7 +23,8 @@ export class AmenityService {
       if (!response) {
         throw new NotFoundException('amenity not found');
       }
-      return response;
+      const totalCount = response.length;
+      return { data: response, totalCount };
     } catch (err) {
       throw err;
     }
@@ -49,6 +50,52 @@ export class AmenityService {
       return createAmenityResponse;
     } catch (err) {
       throw new InternalServerErrorException('error when creating amenity');
+    }
+  }
+
+  // Get amenity by id
+  async getAmenityById(id: number): Promise<any> {
+    try {
+      const response = await this.prisma.amenity.findUnique({
+        where: {
+          id: id,
+        },
+      });
+      if (!response) {
+        throw new NotFoundException('amenity not found');
+      }
+      return response;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  // Update amenity
+  async updateAmenity(
+    amenityId: number,
+    payload: UpdateAmenityBody,
+  ): Promise<any> {
+    const amenity = await this.prisma.amenity.findUnique({
+      where: {
+        id: amenityId,
+      },
+    });
+    if (!amenity) {
+      throw new NotFoundException('error fetching amenity');
+    }
+    try {
+      const response = await this.prisma.amenity.update({
+        where: {
+          id: amenityId,
+        },
+        data: {
+          code: payload.code ? payload.code : amenity.code,
+          name: payload.name ? payload.name : amenity.name,
+        },
+      });
+      return response;
+    } catch (err) {
+      throw new InternalServerErrorException('error when updating amenity');
     }
   }
 }
