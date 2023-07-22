@@ -24,7 +24,7 @@ export class HostService {
     try {
       const getHostsResponse = await this.prisma.host.findMany({
         select: {
-          id: true,
+          user_id: true,
           profile_photo: true,
           user: {
             select: {
@@ -53,7 +53,7 @@ export class HostService {
       const id = parseInt(idStr);
       const getHostResponse = await this.prisma.host.findUnique({
         select: {
-          id: true,
+          user_id: true,
           profile_photo: true,
           user: {
             select: {
@@ -67,7 +67,7 @@ export class HostService {
           },
         },
         where: {
-          id: id,
+          user_id: id,
         },
       });
       if (!getHostResponse) {
@@ -84,7 +84,7 @@ export class HostService {
     try {
       const searchHostsByNameResponse = await this.prisma.host.findMany({
         select: {
-          id: true,
+          user_id: true,
           profile_photo: true,
           user: {
             select: {
@@ -132,8 +132,8 @@ export class HostService {
         data: {
           email: payload.email,
           password: bcrypt.hashSync(payload.password, 10),
-          first_name: payload.firstName,
-          last_name: payload.lastName,
+          first_name: payload.first_name,
+          last_name: payload.last_name,
           phone_number: payload.phone_number,
           gender: payload.gender,
           role: HOST,
@@ -150,68 +150,4 @@ export class HostService {
       throw new InternalServerErrorException('error when creating user');
     }
   }
-
-  // // Tao moi nguoi dung
-  // async createNguoiDung(
-  //   token: string,
-  //   nguoiDung: NguoiDungSwaggerDto,
-  // ): Promise<NguoiDungDto> {
-  //   const isValidToken = await this.authService.validateToken(token);
-  //   if (!isValidToken) {
-  //     throw new Error('Token is not valid');
-  //   }
-
-  //   const user = await this.prisma.nguoi_dung.findUnique({
-  //     where: {
-  //       email: nguoiDung.email,
-  //     },
-  //   });
-  //   if (user) {
-  //     throw new Error('Email da ton tai trong he thong');
-  //   }
-
-  //   const data = await this.prisma.nguoi_dung.create({
-  //     data: nguoiDung,
-  //   });
-  //   return data;
-  // }
-
-  // // Cap nhat nguoi dung
-  // async updateNguoiDung(
-  //   token: string,
-  //   idParam: string,
-  //   nguoiDung: NguoiDungSwaggerDto,
-  // ): Promise<NguoiDungDto> {
-  //   const id = parseInt(idParam);
-  //   const isValidToken = await this.authService.validateToken(token);
-
-  //   if (!isValidToken) {
-  //     throw new Error('Token is not valid');
-  //   }
-
-  //   const data = await this.prisma.nguoi_dung.update({
-  //     where: {
-  //       id: id,
-  //     },
-  //     data: nguoiDung,
-  //   });
-  //   return data;
-  // }
-
-  // // Xoa nguoi dung
-  // async deleteNguoiDung(token: string, idParam: string): Promise<NguoiDungDto> {
-  //   const id = parseInt(idParam);
-  //   const isValidToken = await this.authService.validateToken(token);
-
-  //   if (!isValidToken) {
-  //     throw new Error('Token is not valid');
-  //   }
-
-  //   const data = await this.prisma.nguoi_dung.delete({
-  //     where: {
-  //       id: id,
-  //     },
-  //   });
-  //   return data;
-  // }
 }

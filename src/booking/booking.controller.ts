@@ -11,7 +11,11 @@ import {
 import { BookingService } from './booking.service';
 import { Response } from 'express';
 import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { BookingRequestDto, GetBookingDto } from './dto/booking.dto';
+import {
+  BookingRequestDto,
+  CreatePaymentTransactionDto,
+  GetBookingDto,
+} from './dto/booking.dto';
 import { Delete, Param, Put, Query } from '@nestjs/common/decorators';
 import { ApiResponse } from 'src/shared/dto/ApiResponse.dto';
 
@@ -19,6 +23,30 @@ import { ApiResponse } from 'src/shared/dto/ApiResponse.dto';
 @Controller('v1/booking')
 export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
+
+  // Get all houses per host
+  @Get('/host/:hostId')
+  @ApiParam({ name: 'hostId', required: true, type: Number })
+  async getHouses(
+    @Param('hostId') hostId: string,
+    @Query() query: GetBookingDto,
+    @Res() res: Response,
+  ): Promise<Response> {
+    try {
+      const { pageSize, currentPage } = query;
+      const intHostId = parseInt(hostId);
+      const intPageSize = parseInt(pageSize);
+      const intCurrentPage = parseInt(currentPage);
+      const data = await this.bookingService.getBookings(
+        intHostId,
+        intPageSize,
+        intCurrentPage,
+      );
+      return res.json(new ApiResponse('Success', HttpStatus.OK, data));
+    } catch (err) {
+      return res.json(new ApiResponse(err.message, err.status, null));
+    }
+  }
 
   // Create booking
   @Post('/')
@@ -57,83 +85,37 @@ export class BookingController {
     }
   }
 
-  // // Lay toan bo danh sach dat phong
-  // @Get('/')
-  // async getDatPhong(@Res() res: Response): Promise<Response> {
-  //   try {
-  //     const data = await this.datPhongService.getDatPhong();
+  // Get booking by id
+  @Get('/details/:id')
+  @ApiParam({ name: 'id', required: true, type: String })
+  async getBookingById(
+    @Param('id') id: string,
+    @Res() res: Response,
+  ): Promise<Response> {
+    try {
+      const intId = parseInt(id);
+      const data = await this.bookingService.getBookingById(intId);
+      return res.json(new ApiResponse('Success', HttpStatus.OK, data));
+    } catch (err) {
+      return res.json(new ApiResponse(err.message, err.status, null));
+    }
+  }
 
-  //     return res.status(200).json({
-  //       message: 'Success',
-  //       statusCode: 200,
-  //       content: data,
-  //       dateTime: new Date(),
-  //     });
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.FORBIDDEN);
-  //   }
-  // }
-
-  // // Lay dat phong theo id
-  // @Get('/:id')
-  // @ApiParam({ name: 'id', required: true, type: Number })
-  // async getDatPhongById(
-  //   @Res() res: Response,
-  //   @Param('id') id: string,
-  // ): Promise<Response> {
-  //   try {
-  //     const data = await this.datPhongService.getDatPhongById(id);
-  //     return res.status(200).json({
-  //       message: 'Success',
-  //       statusCode: 200,
-  //       content: data,
-  //       dateTime: new Date(),
-  //     });
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.FORBIDDEN);
-  //   }
-  // }
-
-  // // Cap nhat dat phong
-  // @Put('/:id')
-  // @ApiParam({ name: 'id', required: true, type: Number })
-  // async updateDatPhong(
-  //   @Res() res: Response,
-  //   @Body() body: DatPhongSwaggerDto,
-  //   @Param('id') id: string,
-  //   @Headers('userToken') token: string,
-  // ): Promise<Response> {
-  //   try {
-  //     const data = await this.datPhongService.updateDatPhong(token, id, body);
-  //     return res.status(200).json({
-  //       message: 'Success',
-  //       statusCode: 200,
-  //       content: data,
-  //       dateTime: new Date(),
-  //     });
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.FORBIDDEN);
-  //   }
-  // }
-
-  // // Xoa dat phong
-  // @Delete('/:id')
-  // @ApiParam({ name: 'id', required: true, type: Number })
-  // async deleteDatPhong(
-  //   @Res() res: Response,
-  //   @Param('id') id: string,
-  //   @Headers('userToken') token: string,
-  // ): Promise<Response> {
-  //   try {
-  //     const data = await this.datPhongService.deleteDatPhong(token, id);
-  //     return res.status(200).json({
-  //       message: 'Dat phong da duoc xoa thanh cong',
-  //       statusCode: 200,
-  //       content: data,
-  //       dateTime: new Date(),
-  //     });
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.FORBIDDEN);
-  //   }
-  // }
+  // Create payment transaction for booking
+  @Post('/payment')
+  async createPaymentTransaction(
+    @Body() body: CreatePaymentTransactionDto,
+    @Res() res: Response,
+    @Headers('token') token: string,
+  ): Promise<Response> {
+    try {
+      const data = await this.bookingService.createPaymentTransaction(
+        token,
+        body,
+      );
+      return res.json(new ApiResponse('Success', HttpStatus.OK, data));
+    } catch (err) {
+      return res.json(new ApiResponse(err.message, err.status, null));
+    }
+  }
 }

@@ -29,24 +29,22 @@ model User {
 }
 
 model Customer {
-  id            Int       @id @default(autoincrement())
+  user_id       Int       @id @unique
   created_at    DateTime? @default(now())
   updated_at    DateTime? @updatedAt
   profile_photo String?   @db.VarChar(1000)
-  user_id       Int?      @unique
   user          User?     @relation(fields: [user_id], references: [id])
 
   @@map("customer")
 }
 
 model Host {
-  id            Int       @id @default(autoincrement())
+  user_id       Int       @id @unique
   created_at    DateTime? @default(now())
   updated_at    DateTime? @updatedAt
   is_superhost  Boolean?  @default(false)
   is_verified   Boolean?  @default(false)
   profile_photo String?   @db.VarChar(1000)
-  user_id       Int?      @unique
   user          User?     @relation(fields: [user_id], references: [id])
 
   @@map("host")
@@ -133,6 +131,7 @@ model Booking {
   id                 Int                  @id @default(autoincrement())
   created_at         DateTime?            @default(now())
   updated_at         DateTime?            @updatedAt
+  code               String?
   booking_date       DateTime?
   check_in_date      String?
   check_out_date     String?
@@ -153,6 +152,7 @@ model PaymentTransaction {
   id              Int       @id @default(autoincrement())
   created_at      DateTime? @default(now())
   updated_at      DateTime? @updatedAt
+  transaction_no  String?   @db.VarChar(255)
   ref             String?   @db.VarChar(255)
   amount          Int?
   payment_date    DateTime?

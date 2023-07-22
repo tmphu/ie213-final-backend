@@ -12,7 +12,7 @@ export class HouseService {
   constructor(private readonly authService: AuthService) {}
   private prisma = new PrismaClient();
 
-  // Get all houses
+  // Get all houses per host
   async getHouses(
     hostId: number,
     pageSize = 10,
@@ -94,11 +94,7 @@ export class HouseService {
           id: id,
         },
         include: {
-          user: {
-            include: {
-              host: true,
-            },
-          },
+          user: true,
           HouseImage: true,
           amenity: true,
           Review: true,

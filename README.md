@@ -3,7 +3,7 @@
 This project is built on Nestjs, a robust framework to build web application using TypeScript and Nodejs. Read more: [NestJS](https://github.com/nestjs/nest)
 
 ## Install dependencies
-This project uses yarn as package manager. For consistency between developers, please do not use npm.
+This project uses yarn as package manager. For consistency between developers, please DO NOT use npm.
 ```bash
 $ yarn install
 ```
@@ -51,6 +51,20 @@ $ yarn run start:debug
 # production mode
 $ yarn run start:prod
 ```
+
+## Test Payment Service
+### VNPAY
+
+Ngân hàng	NCB  
+Số thẻ:	9704198526191432198  
+Tên chủ thẻ:	NGUYEN VAN A  
+Ngày phát hành:	07/15  
+Mật khẩu OTP:	123456  
+
+### VNPAY Merchant
+url: https://sandbox.vnpayment.vn/merchantv2/  
+login: nguyentanphu1928@gmail.com  
+password: PhuNguyen1928  
 
 ## Support
 

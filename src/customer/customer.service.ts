@@ -29,7 +29,7 @@ export class CustomerService {
     try {
       const response = await this.prisma.customer.findMany({
         select: {
-          id: true,
+          user_id: true,
           profile_photo: true,
           user: {
             select: {
@@ -62,7 +62,7 @@ export class CustomerService {
       const id = parseInt(idStr);
       const getCustomerResponse = await this.prisma.customer.findUnique({
         select: {
-          id: true,
+          user_id: true,
           profile_photo: true,
           user: {
             select: {
@@ -76,7 +76,7 @@ export class CustomerService {
           },
         },
         where: {
-          id: id,
+          user_id: id,
         },
       });
       if (!getCustomerResponse) {
@@ -94,7 +94,7 @@ export class CustomerService {
       const searchCustomersByNameResponse = await this.prisma.customer.findMany(
         {
           select: {
-            id: true,
+            user_id: true,
             profile_photo: true,
             user: {
               select: {
@@ -169,7 +169,7 @@ export class CustomerService {
   ): Promise<any> {
     const customer = await this.prisma.customer.findFirst({
       where: {
-        id: customerId,
+        user_id: customerId,
       },
       include: {
         user: true,
@@ -181,7 +181,7 @@ export class CustomerService {
     try {
       const response = await this.prisma.customer.update({
         where: {
-          id: customerId,
+          user_id: customerId,
         },
         data: {
           user: {
@@ -208,21 +208,4 @@ export class CustomerService {
       throw new InternalServerErrorException('error when updating customer');
     }
   }
-
-  // // Xoa nguoi dung
-  // async deleteNguoiDung(token: string, idParam: string): Promise<NguoiDungDto> {
-  //   const id = parseInt(idParam);
-  //   const isValidToken = await this.authService.validateToken(token);
-
-  //   if (!isValidToken) {
-  //     throw new Error('Token is not valid');
-  //   }
-
-  //   const data = await this.prisma.nguoi_dung.delete({
-  //     where: {
-  //       id: id,
-  //     },
-  //   });
-  //   return data;
-  // }
 }

@@ -36,7 +36,7 @@ import { CreateHouseBody, GetHouseDto, UpdateHouseBody } from './dto/house.dto';
 export class HouseController {
   constructor(private readonly houseService: HouseService) {}
 
-  // Get all houses
+  // Get all houses per host
   @Get('/host/:hostId')
   @ApiParam({ name: 'hostId', required: true, type: Number })
   async getHouses(

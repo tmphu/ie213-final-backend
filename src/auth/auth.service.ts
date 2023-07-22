@@ -34,7 +34,13 @@ export class AuthService {
       const isMatch = bcrypt.compareSync(password, user.password);
       if (isMatch) {
         const token = this.jwt.sign(
-          { data: { email: email, password: password } },
+          {
+            data: {
+              email: email,
+              first_name: user.first_name,
+              last_name: user.last_name,
+            },
+          },
           { secret: this.secretKey, expiresIn: this.expiryDuration },
         );
         return mapToUserLoginResponseDto(user, token);

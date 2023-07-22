@@ -26,14 +26,14 @@ class CreateHostDto {
     description: 'first name',
     type: String,
   })
-  firstName: string;
+  first_name: string;
 
   @ApiProperty({
     example: 'appleseed',
     description: 'last name',
     type: String,
   })
-  lastName: string;
+  last_name: string;
 
   @ApiProperty({
     example: '0912345678',

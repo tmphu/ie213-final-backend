@@ -107,7 +107,7 @@ class GetCustomersDto {
 
 function mapToCustomerFlatDto(...args: any[]): CustomerDto[] {
   return args.map((customer) => ({
-    customer_id: customer.id,
+    customer_id: customer.user_id,
     first_name: customer.user?.first_name,
     last_name: customer.user?.last_name,
     email: customer.user?.email,
