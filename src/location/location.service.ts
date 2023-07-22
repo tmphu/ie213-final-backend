@@ -93,21 +93,4 @@ export class LocationService {
       throw new InternalServerErrorException('error when updating location');
     }
   }
-
-  // // Xoa vi tri
-  // async deleteViTri(token: string, idParam: string): Promise<ViTriDto> {
-  //   const id = parseInt(idParam);
-  //   const isValidToken = await this.authService.validateToken(token);
-
-  //   if (!isValidToken) {
-  //     throw new Error('Token is not valid');
-  //   }
-
-  //   const data = await this.prisma.vi_tri.delete({
-  //     where: {
-  //       id: id,
-  //     },
-  //   });
-  //   return data;
-  // }
 }
