@@ -1,4 +1,4 @@
-## Description
+# Getting Started with IE213 - Back End
 
 This project is built on Nestjs, a robust framework to build web application using TypeScript and Nodejs. Read more: [NestJS](https://github.com/nestjs/nest)
 
@@ -65,13 +65,3 @@ Mật khẩu OTP:	123456
 url: https://sandbox.vnpayment.vn/merchantv2/  
 login: nguyentanphu1928@gmail.com  
 password: PhuNguyen1928  
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
