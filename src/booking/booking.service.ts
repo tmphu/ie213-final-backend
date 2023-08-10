@@ -94,6 +94,28 @@ export class BookingService {
     }
   }
 
+  // Get booking by code
+  async getBookingByCode(code: string): Promise<any> {
+    try {
+      const response = await this.prisma.booking.findFirst({
+        where: {
+          code: code,
+        },
+        include: {
+          house: true,
+          user: true,
+          PaymentTransaction: true,
+        },
+      });
+      if (!response) {
+        throw new NotFoundException('booking not found');
+      }
+      return response;
+    } catch (err) {
+      throw err;
+    }
+  }
+
   // Create booking
   async createBooking(token: string, payload: BookingRequestDto): Promise<any> {
     try {

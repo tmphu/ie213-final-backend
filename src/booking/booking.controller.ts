@@ -101,6 +101,21 @@ export class BookingController {
     }
   }
 
+  // Get booking by code
+  @Get('/details/code/:code')
+  @ApiParam({ name: 'code', required: true, type: String })
+  async getBookingByCode(
+    @Param('code') code: string,
+    @Res() res: Response,
+  ): Promise<Response> {
+    try {
+      const data = await this.bookingService.getBookingByCode(code);
+      return res.json(new ApiResponse('Success', HttpStatus.OK, data));
+    } catch (err) {
+      return res.json(new ApiResponse(err.message, err.status, null));
+    }
+  }
+
   // Create payment transaction for booking
   @Post('/payment')
   async createPaymentTransaction(
